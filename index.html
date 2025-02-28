@@ -5,49 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Food Ordering System</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 20px;
-      background-color: #f4f4f4;
-    }
-    .container {
-      max-width: 400px;
-      margin: 0 auto;
-      background: #fff;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    }
-    h1 {
-      text-align: center;
-    }
-    .menu-item {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 10px;
-    }
-    .cart {
-      margin-top: 20px;
-    }
-    .cart-item {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 10px;
-    }
-    button {
-      display: block;
-      width: 100%;
-      padding: 10px;
-      background-color: #28a745;
-      color: #fff;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #218838;
-    }
+    /* Add your CSS here */
   </style>
 </head>
 <body>
@@ -105,7 +63,7 @@
       document.getElementById("total").textContent = total.toFixed(2);
     }
 
-    function placeOrder() {
+    async function placeOrder() {
       const customerName = prompt("Enter your name:");
       const phoneNumber = prompt("Enter your phone number:");
 
@@ -132,23 +90,25 @@
         totalPrice: parseFloat(document.getElementById("total").textContent)
       };
 
-      fetch('https://script.google.com/macros/s/AKfycbzuTJrH-AVPk-9pW_w4bcDj7_uunt8_uqlCFaK4aQo/dev', {
-        method: 'POST',
-        body: JSON.stringify(orderData)
-      })
-      .then(response => response.json())
-      .then(data => {
+      try {
+        const response = await fetch('YOUR_GOOGLE_SCRIPT_URL', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(orderData)
+        });
+        const data = await response.json();
         if (data.success) {
           alert("Order placed successfully!");
           window.location.reload();
         } else {
           alert("Failed to place order.");
         }
-      })
-      .catch(error => {
+      } catch (error) {
         console.error("Error:", error);
         alert("An error occurred while placing the order.");
-      });
+      }
     }
 
     // Add event listeners to quantity inputs
