@@ -1,92 +1,163 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Live Menu Example</title>
-    <style>
-        .menu-category {
-            border: 2px solid #ccc;
-            padding: 20px;
-            margin: 20px;
-        }
-        .item {
-            background: #f5f5f5;
-            padding: 10px;
-            margin: 10px;
-            display: inline-block;
-            width: 200px;
-        }
-        .item img {
-            width: 100%;
-            height: 150px;
-            object-fit: cover;
-        }
-        .add-item-form {
-            margin: 20px;
-            padding: 20px;
-            border: 1px solid #999;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Food Ordering System</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f4f4f4;
+    }
+    .container {
+      max-width: 400px;
+      margin: 0 auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    h1 {
+      text-align: center;
+    }
+    .menu-item {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .cart {
+      margin-top: 20px;
+    }
+    .cart-item {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    button {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      background-color: #28a745;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #218838;
+    }
+  </style>
 </head>
 <body>
-    <!-- Menu Category -->
-    <div class="menu-category" id="food">
-        <h2>🍔 Food</h2>
-        <div class="item-container">
-            <!-- Existing Item -->
-            <div class="item">
-                <h3>Classic Burger</h3>
-                <p>$ <span class="price">12</span></p>
-                <input type="number" class="quantity" min="0" placeholder="0">
-                <img src="https://via.placeholder.com/200x150" alt="Burger">
-            </div>
-        </div>
+  <div class="container">
+    <h1>Food Ordering</h1>
+    <div class="menu">
+      <div class="menu-item">
+        <span>Burger</span>
+        <input type="number" id="burger" min="0" value="0">
+      </div>
+      <div class="menu-item">
+        <span>Pizza</span>
+        <input type="number" id="pizza" min="0" value="0">
+      </div>
+      <div class="menu-item">
+        <span>Fries</span>
+        <input type="number" id="fries" min="0" value="0">
+      </div>
     </div>
-
-    <!-- Add Item Form -->
-    <div class="add-item-form">
-        <h3>Add New Item</h3>
-        <input type="text" id="itemName" placeholder="Item name">
-        <input type="number" id="itemPrice" placeholder="Price">
-        <input type="text" id="itemImage" placeholder="Image URL (optional)">
-        <button onclick="addNewItem()">Add Item to Menu</button>
+    <div class="cart">
+      <h2>Cart</h2>
+      <div id="cart-items"></div>
+      <p>Total: $<span id="total">0.00</span></p>
     </div>
-<script>
-    // Function to create item HTML
-    function createItem(name, price, imageUrl = 'https://via.placeholder.com/200x150') {
-        return `
-            <div class="item">
-                <h3>${name}</h3>
-                <p>$ <span class="price">${price}</span></p>
-                <input type="number" class="quantity" min="0" placeholder="0">
-                <img src="${imageUrl}" alt="${name}">
+    <button onclick="placeOrder()">Place Order</button>
+  </div>
+
+  <script>
+    const prices = {
+      burger: 5.99,
+      pizza: 8.99,
+      fries: 3.99
+    };
+
+    const cart = {};
+
+    function updateCart() {
+      const cartItems = document.getElementById("cart-items");
+      let total = 0;
+      cartItems.innerHTML = "";
+
+      for (const item in cart) {
+        if (cart[item] > 0) {
+          const itemTotal = cart[item] * prices[item];
+          total += itemTotal;
+          cartItems.innerHTML += `
+            <div class="cart-item">
+              <span>${item} x ${cart[item]}</span>
+              <span>$${itemTotal.toFixed(2)}</span>
             </div>
-        `;
-    }
-
-    // Function to add item to category
-    function addItemToCategory(categoryId, itemHTML) {
-        const container = document.querySelector(`#${categoryId} .item-container`);
-        container.innerHTML += itemHTML;
-    }
-// Form handler
-        function addNewItem() {
-            const name = document.getElementById('itemName').value;
-            const price = document.getElementById('itemPrice').value;
-            const image = document.getElementById('itemImage').value;
-
-            if (!name || !price) {
-                alert('Please fill in name and price!');
-                return;
-            }
-
-            const newItem = createItem(name, price, image);
-            addItemToCategory('food', newItem);
-
-            // Clear form
-            document.getElementById('itemName').value = '';
-            document.getElementById('itemPrice').value = '';
-            document.getElementById('itemImage').value = '';
+          `;
         }
-    </script>
+      }
+
+      document.getElementById("total").textContent = total.toFixed(2);
+    }
+
+    function placeOrder() {
+      const customerName = prompt("Enter your name:");
+      const phoneNumber = prompt("Enter your phone number:");
+
+      if (!customerName || !phoneNumber) {
+        alert("Please provide your name and phone number.");
+        return;
+      }
+
+      const items = [];
+      const quantities = [];
+
+      for (const item in cart) {
+        if (cart[item] > 0) {
+          items.push(item);
+          quantities.push(cart[item]);
+        }
+      }
+
+      const orderData = {
+        customerName,
+        phoneNumber,
+        items,
+        quantities,
+        totalPrice: parseFloat(document.getElementById("total").textContent)
+      };
+
+      fetch('https://script.google.com/macros/s/AKfycbyqs29jv9w8IMkigizAFs9YsRI1eS6VTG2dExBIxfEm9imf5eNhtnue_jPzA6zTxrQ9/exec', {
+        method: 'POST',
+        body: JSON.stringify(orderData)
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          alert("Order placed successfully!");
+          window.location.reload();
+        } else {
+          alert("Failed to place order.");
+        }
+      })
+      .catch(error => {
+        console.error("Error:", error);
+        alert("An error occurred while placing the order.");
+      });
+    }
+
+    // Add event listeners to quantity inputs
+    document.querySelectorAll(".menu input").forEach(input => {
+      input.addEventListener("change", (e) => {
+        cart[e.target.id] = parseInt(e.target.value);
+        updateCart();
+      });
+    });
+  </script>
 </body>
 </html>
